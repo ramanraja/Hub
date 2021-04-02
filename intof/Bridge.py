@@ -78,7 +78,7 @@ que = deque()
 # helpers
 #--------------------------------------------------------------------------------------------
 def bridge_test_method():
-    print ('\n--- I am the bridge stub ! ---\n')
+    print ('\n--- I am the bridge stub ---\n')
    
 #--------------------------------------------------------------------------------------------
 # daemon
@@ -214,7 +214,7 @@ def extract_status (message):
     if not devid in in_mem_devices:          # unregistered/ disabled device found; cache them in a separate structure
         if not devid in new_devices:         # we are hearing from this device for the first time
             new_devices[devid] = []          # create the key
-        if (not rsid in new_devices[devid]): # avoid duplicate relsens!
+        if (not rsid in new_devices[devid]): # avoid duplicate relsens
             new_devices[devid].append(rsid)
         return None                          # do not process unregistered devices any further
     # device is in the database, is enabled, but not in the in_mem_status cache yet:
@@ -237,6 +237,7 @@ def process_lwt (devid, message):    # TODO: there is too much work done in the 
         send_offline_notification (devid)        
         return
     if (onoff_line == ONLINE):              # TODO:  should we ping the device now?                        
+        trigger_network_params (devid)
         dprint ('Last known good status:')  # TODO: issue the commands to set the status with last_good_status
         dprint (last_good_status[devid])
         ###restore_device_status (devid)
@@ -542,7 +543,7 @@ def on_mqtt_message (client, userdata, message):
         if (jstatus is not None):                   
             socketio.emit (SERVER_EVENT, jstatus)   # move this to a worker thread; think: what if there is no socket client?
     except Exception as e:                          
-        print ('* EXCEPTION 3: ', str(e))           # this exception does happen often in practice
+        print ('* EXCEPTION 3: ', str(e))           # this exception does happen, often, in practice
             
 #--------------------------------------------------------------------------------------------
 # Socket IO
@@ -710,8 +711,8 @@ def get_inmem_relsens():
 # this is internally called to restore last known good status of a device that comes online
 def restore_device_status (device_status):
     dids = list(device_status.keys())
-    print (dids)
-    print (type(dids))
+    #print (dids)
+    #print (type(dids))
     device_id = dids[0]          # assumption: there will be only one device at a time 
     dprint ('Restoring device status: ', device_id)
     actions = device_status[device_id]
@@ -893,18 +894,22 @@ def trigger_sensor_reading():
         return ({'result' : True, 'msg' : 'in simulation mode'})
     request_sensor_reading (devid)   
     return ({'result' : True, 'msg' : 'triggered sensor reading'})
-        
+
+
+def trigger_network_params (devid=BROADCAST_DEVICE):
+    request_network_params (devid) # this device id need not be present in the databse
+            
+            
 # manual update: request network parameters like IP address, MAC and gateway
 @app.route('/trigger/network/params', methods=['GET'])
-def trigger_network_params():
-    devid = request.args.get('device_id')
-    if (not devid):
-        #return ({'result' : False, 'error' : 'device_id is required'})
-        devid = BROADCAST_DEVICE
+def trigger_network_params_route():
     if SIMULATION_MODE:
         return ({'result' : True, 'msg' : 'in simulation mode'})
-    request_network_params (devid) # this device id need not be present in the databse
-    return ({'result' : True, 'msg' : 'requested network params'})        
+    devid = request.args.get('device_id')
+    if (not devid):
+        devid = BROADCAST_DEVICE
+    trigger_network_params (devid)     
+    return ({'result' : True, 'msg' : 'requested network params'})   
         
 #---------- online status filters : device level
     
@@ -942,7 +947,7 @@ def get_online_relsens():
     print('\nReturning status of registered relsens that are online..')
     if SIMULATION_MODE:
         print('\nReturning registered relsens that are online..')
-        return (simul_status) # in simulation mode every device is always online!
+        return (simul_status) # in simulation mode every device is always online
     print('\nReturning  registered and active relsens that are offline..')
     if in_mem_status is None:
         send_tracer_broadcast()  # to build the status
@@ -955,7 +960,7 @@ def get_offline_relsens():
     print('\nReturning registered relsens that are offline..')
     if SIMULATION_MODE:
         print('\nReturning registered relsens that are offline..')
-        return ({}) # in simulation mode every device is always online!
+        return ({}) # in simulation mode every device is always online
     print('\nReturning  registered and active relsens that are offline..')
     if in_mem_status is None:
         send_tracer_broadcast()  # to build the status
@@ -1036,7 +1041,7 @@ def get_network_address():
         return ({'result' : False, 'error' : 'device_id is required'})
     if SIMULATION_MODE:
         return ({'result' : False, 'error' : 'in simulation mode'})  
-    if in_mem_network is None:
+    if in_mem_network is None or len(in_mem_network)==0:
          request_network_params (BROADCAST_DEVICE)
          return {'result' : False, 'error' : 'in_mem_network is not available; please try again'}
     if (devid not in in_mem_network):
@@ -1047,7 +1052,7 @@ def get_network_address():
 def dump_network_info():
     if SIMULATION_MODE:
         return ({'result' : False, 'error' : 'in simulation mode'})  
-    if in_mem_network is None:
+    if in_mem_network is None or len(in_mem_network)==0:
          request_network_params (BROADCAST_DEVICE)
          return {'result' : False, 'error' : 'in_mem_network is not available; please refresh the page'}
     return in_mem_network
