@@ -1,0 +1,78 @@
+Automatic configuration of an Intof IoT device.
+
+Preparing the configuration parameters:
+A device configuration file has the following JSON format:
+{
+  "wifi_ssid1"       : "your-home-ssid",
+  "wifi_password1"   : "your-wifi-passwd",
+  "wifi_ssid2"       : "mobile-hotspot-ssid",
+  "wifi_password2"   : "hotspot-passwd",  
+  "hub_ip"           : "192.168.0.100",
+  "alexa_name1"      : "bath room light",
+  "alexa_name2"      : "bed room fan",
+  "alexa_name3"      : "kitchen light",
+  "alexa_name4"      : "pump motor",    
+  "security_key"    : "kloju#@%hjASdf0aswfklj54@#^%aldkjsf0ASDGFSHkl345#$%"
+}
+
+Edit the file Config.txt on your laptop. (See the sample_config.txt file for reference).
+Enter your main and backup Wifi SSIDs and passwords. 
+Tip: The backup Wifi can be the WiFi hot spot on your mobile phone.
+Enter the IP address of the hub.
+Enter any random string for security_key. (This is a cloud feature, and not yet implemented).
+
+If you own an Amazon Echo device and want to Alexa-enable your device, enter upto 4 names that Alexa should recognize.
+Tip: Words and phrases found in English dictionary have better chances of getting recognized, rather than native names.
+
+--------------------------------------------------------------------------------------------------------
+
+Scenario 1:
+-----------
+Configuring a new IoT device, which has never been set up with WiFi credentials:
+
+Switch on your new IoT device.
+Open the WiFi network configuration menu on your laptop.
+There will be a new AP of the form Intof_xxxxxx.
+Connect your laptop to that Wifi AP.
+Run the program AutoConfig.py.
+If everything goes well, you should see a 'Configuration completed' message.
+Check the file 'Log.txt' to ensure all the steps were successful.
+
+If there are error messages, rename the log file to save it. (The log file will be overwritten every time, to save space on the Raspberry Pi).
+
+--------------------------------------------------------------------------------------------------------
+Scenario 2:
+
+Your IoT device already connects to the home wifi network, so you only want to configure the other parameters.
+Delete all the 4 entries   wifi_ssid1, wifi_password1, wifi_ssid2 and wifi_password2 from the file config.txt.
+
+Find the IP address of your IoT device. This can be done in 2 ways:
+1. Login to your home router and find the connected devices. Search for devices starting with Intof_xxxx and note its IP address.
+2. Open a browser and connect to your hub portal. For example, if your hub runs at 192.168.1.25, open the URL
+http://192.168.1.25:5000/dump/network/info
+The IP address of all connected devices will be listed.
+
+If the above URL returns and empty list, rebuild device inventory first and try again:
+http://192.168.1.25:5000/build/device/inventory
+
+Run the AutoConfig.py program, but in this case, supply the IP address of your IoT device on the command line.
+Example: If your IoT device is at IP address 192.168.0.12, then run
+$ python  Autoconfig.py  192.168.0.12
+
+The same approach can be used to change/overwrite the existing WiFi network.
+Do not delete wifi_ssids and wifi_passwords from the file config.txt; instead, enter the new credentials you want to setup.
+Connect the IoT device through the old (existing) Wifi network and run the command
+$ python  Autoconfig.py  192.168.0.12
+
+When the device restarts, it will try to connect to the new WiFi network with the fresh credentials.
+--------------------------------------------------------------------------------------------------------
+
+If you are configuring Alexa control, restart the IoT device and issue the voice command: 
+"Alexa, discover my devices".
+
+If it is successful, you can voice-control the IoT device; for example: 
+"Alexa, switch on pump motor".
+"Alexa, turn off bath room light".
+Repeat this for every IoT device you have.
+
+If any of your devices are left out, run Alexa discovery again after a few seconds.

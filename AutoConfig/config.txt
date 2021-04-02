@@ -1,0 +1,12 @@
+{
+  "wifi_ssid1"       : "RajaSKY",
+  "wifi_password1"   : "Appu@123",
+  "wifi_ssid2"       : "RajaMobile",
+  "wifi_password2"   : "raja1234",  
+  "hub_ip"           : "192.168.0.100",
+  "alexa_name1"      : "hall light",
+  "alexa_name2"      : "guest room fan",
+  "alexa_name3"      : "pump motor",     
+  "alexa_name4"      : "back yard",
+  "security_key"     : "kloju#@%hjASdf0aswfklj54@#^%aldkjsf0ASDGFSHkl345#$%"
+}

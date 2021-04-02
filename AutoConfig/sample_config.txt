@@ -1,0 +1,12 @@
+{
+  "wifi_ssid1"       : "your-home-ssid",
+  "wifi_password1"   : "your-wifi-passwd",
+  "wifi_ssid2"       : "mobile-hotspot-ssid",
+  "wifi_password2"   : "hotspot-passwd",  
+  "hub_ip"           : "192.168.0.100",
+  "alexa_name1"      : "bath room light",
+  "alexa_name2"      : "bed room fan",
+  "alexa_name3"      : "kitchen light",
+  "alexa_name4"      : "pump motor",    
+  "security_key"    : "kloju#@%hjASdf0aswfklj54@#^%aldkjsf0ASDGFSHkl345#$%"
+}
