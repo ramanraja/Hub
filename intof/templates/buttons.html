@@ -107,7 +107,7 @@ function add_button (row_obj, col_no, device_id, relsen_id) {
  {  
     console.log('<=[RESP]' +JSON.stringify (msg));
     if (msg.relsen_id == 'SENSOR') {
-        document.getElementById("status").innerHTML = JSON.stringify(msg)
+        /* document.getElementById("status").innerHTML = JSON.stringify(msg) */
         return;
     }
     var bgcolor = 'DarkRed';
