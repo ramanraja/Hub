@@ -98,7 +98,17 @@ def buttons():
         return (result)
     return render_template ('buttons.html', SerVar=result)     
                     
-                    
+
+# clickable links to IP addresses of all your devices            
+@app.route('/links')
+def links():
+    result = b.dump_network_info()
+    dprint (result)
+    if ('error' in result):
+        return (result)
+    return render_template ('links.html', SerVar=result) 
+                        
+                        
 # socket to MQTT bridge; you can send an arbitrary MQTT payload to any topic      
 # CAUTION:  Disable it in production mode, if you are deploying on a cloud ****
 @app.route('/bridge')

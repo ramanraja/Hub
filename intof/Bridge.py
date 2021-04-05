@@ -897,7 +897,7 @@ def trigger_sensor_reading():
 
 
 def trigger_network_params (devid=BROADCAST_DEVICE):
-    request_network_params (devid) # this device id need not be present in the databse
+    request_network_params (devid) # this device id need not be present in the database
             
             
 # manual update: request network parameters like IP address, MAC and gateway

@@ -3,14 +3,14 @@
 <body style="font-family:verdana" onload="AutoAdd()">
 
 <h3> <p style="font-family:verdana"> Intof IoT controller </p></h3>
-<a href="/get/devices">devices</a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="/discover/devices">discover</a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="/auto/onboard/devices">onboard</a><br/><br/>
+<a href="/links">Devices</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/discover/devices">Discover</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/auto/onboard/devices">Onboard</a><br/><br/>
 
 <table id="dynaTable">
 
 <!--script src="socket.io.min.js"-->    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script> 
+<script src="/static/socket.io.min.js"></script> 
 
 <script type="text/javascript">
 var devices = {{SerVar | tojson }};   

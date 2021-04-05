@@ -74,7 +74,7 @@ the following function has a dummy implementation in HouseKeeper.
 remove that, and implement the below funcation    
 @app.route('/add/devices')   
 def add_devices (wifi_ssid_list):      
-    print ('STUB: add_devices')
+    print ('STUB: add_devices, using their WiFi addresses only')
 '''
     
 # Old design:
