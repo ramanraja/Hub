@@ -78,7 +78,7 @@ que = deque()
 # helpers
 #--------------------------------------------------------------------------------------------
 def bridge_test_method():
-    print ('\n--- I am the bridge stub ---\n')
+    print ('\n--- I am the bridge test stub ---\n')
    
 #--------------------------------------------------------------------------------------------
 # daemon
@@ -92,11 +92,11 @@ def cmdtask():
         if TERMINATE : 
             break
         if (len(que) > 0):
-            lgstatus = que.popleft()  # last good status is of the form device_id:[status,status,status]
-            print ("dequeing LG staus: ", lgstatus)
+            lkg_status = que.popleft()  # last good status is of the form device_id:[status,status,status]
+            print ("Dequeing LKG staus: ", lkg_status)
             socketio.sleep (BUFFER_DELAY)  # to guarentee a minimum delay after LWT; because the device sends all OFF status immediately after power up
-            restore_device_status (json.loads(lgstatus))  #  if we send a raw dictionary, it will be passed by reference.., 
-    print ('\n * Commander thread terminates. *\n')       #  and that dictionary will be overwritten by main thread !
+            restore_device_status (json.loads(lkg_status))  #  if we send a raw dictionary, it will be passed by reference.., 
+    print ('\n * Commander thread terminates. *\n')         #  ... and that dictionary will be overwritten by main thread !  ***
     
 def bgtask():
     global TERMINATE
@@ -111,7 +111,7 @@ def bgtask():
             if (not is_online[devid]['online']):  # TODO: Make 3 attempts before declaring it offline
                 is_online[devid]['count'] = (is_online[devid]['count']+1) % MAX_RETRIES
                 if (is_online[devid]['count']==0):
-                    mark_offline (devid)
+                    mark_offline (devid, 'timer')
                     send_offline_notification (devid)
         for devid in is_online:
             is_online[devid]['online'] = False    # reset for next round of checking   
@@ -206,7 +206,7 @@ def extract_status (message):
     if (rsid == IPMAC_STATUS):   # STATUS5: IP address and MAC values of device
         update_network_params (devid, payload)
         return None        
-    if (not rsid.startswith('POWER')):      # TODO: handle other messages also
+    if (not rsid.startswith('POWER')):       # TODO: handle other messages also
         return None  # no more processing
     sta = message.payload.decode()           # payload is the relay status: ON/OFF
     jstatus = {"device_id" : devid, "relsen_id" : rsid, "status" : sta}
@@ -221,28 +221,28 @@ def extract_status (message):
     if not devid in in_mem_status:           # this acts as device discovery
         in_mem_status[devid] = {}            # add the newly discovered device as the key
     if not devid in last_good_status:
-        last_good_status[devid] = {}    
+        last_good_status[devid] = {}         # create the key
     in_mem_status[devid][rsid] = sta
     last_good_status [devid][rsid] = sta     # in_mem_status is going to be polluted by 'offline', so save a copy of ON/OFF only
     is_online[devid]['online'] = True        # this creates the key, if not already existing
     return jstatus
     
     
-def process_lwt (devid, message):    # TODO: there is too much work done in the MQTT thread here. Move it to a worker thread      
+def process_lwt (devid, message):            # TODO: this happens in the MQTT thread. Move it to a worker thread ?
     global que
     onoff_line = message.lower()
     dprint ('* {} is {} !'.format(devid, onoff_line))
     if (onoff_line == OFFLINE):             
-        mark_offline (devid)
+        mark_offline (devid, 'LWT')
         send_offline_notification (devid)        
         return
-    if (onoff_line == ONLINE):              # TODO:  should we ping the device now?                        
+    if (onoff_line == ONLINE):               # TODO:  should we ping the device now?                        
         trigger_network_params (devid)
-        dprint ('Last known good status:')  # TODO: issue the commands to set the status with last_good_status
+        dprint ('Last known good status for ', devid, ' :')   
         dprint (last_good_status[devid])
-        ###restore_device_status (devid)
+        ###restore_device_status (devid)     # it gets immediately overwritten by all OFF messages; so moved it to a delay thread
         jstatus = {devid : last_good_status[devid]}  
-        que.append (json.dumps(jstatus))    # if you pass a dictionary, it will be passed by reference!
+        que.append (json.dumps(jstatus))     # if you pass a dictionary, it will be passed by reference! (and will be overwritten before restoring status)
     else:                                       
         dprint ('* ERROR: something is wrong with LWT message')
         
@@ -280,29 +280,19 @@ def clear_retained_mqtt_messages():
     
 # ask for the sensor reading from a device        
 def request_sensor_reading (device_id):  
-    dprint('\nTriggering sensor reading..')      
+    #dprint('Triggering sensor reading..')      
     topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, SENSOR_SUFFIX) #  cmnd/device_id/status 
-    dprint (topic, SENSOR_PAYLOAD) # '10'
-    mqtt.publish (topic, SENSOR_PAYLOAD)     
+    dprint ('Sending probe: ', topic, SENSOR_PAYLOAD)
+    mqtt.publish (topic, SENSOR_PAYLOAD)  # '10'   
              
 # ask for the IP address and MAC of a device        
 def request_network_params (device_id):  
-    dprint('\nRequesting network params..')      
+    #dprint('Requesting network params..')      
     topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, IPMAC_SUFFIX) #  cmnd/device_id/status 
-    dprint (topic, IPMAC_PAYLOAD) # '5'
-    mqtt.publish (topic, IPMAC_PAYLOAD) 
+    dprint ('Sending probe: ', topic, IPMAC_PAYLOAD)
+    mqtt.publish (topic, IPMAC_PAYLOAD) # '5'
                  
-# ping the first relsen of a particular device (enabled or not):
-# the result will be a single response from that device.
-def ping_device (device_id):
-    if SIMULATION_MODE:
-        dprint ('In simulation mode: not pinging the device')
-        return
-    dprint ('\nPinging the device: ',device_id)
-    topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, PUB_SUFFIX) # POWER  
-    dprint (topic, ' (blank)')
-    mqtt.publish (topic, EMPTY_PAYLOAD) 
-    
+   
 # configure upto 4 timers (2 ON, 2 OFF) for one relay in one device
 # There are 16 timers in Tasmota; so upto 4 timers per relay can be assigned, for a maximum of 4 relays
 # *** ASSUMPTION: relsen_id is strictly one of the following: POWER, POWER1,POWER2,POWER3 or POWER4   ***
@@ -370,6 +360,21 @@ def clear_timers (device_id, relsen_id):
         mqtt.publish (topic, payload)
     return True
         
+# ---------- Pinging ---------------------------------------------------
+
+# Ping = send a POWER or POWER0 command with blank payload to a device
+# This is not the regular ping <ip_address> network protocol; (tasmota implements that also)
+# ping the first relsen of a particular device (enabled or not):
+# the result will be a single response from that device.
+def ping_device (device_id):
+    if SIMULATION_MODE:
+        dprint ('In simulation mode: not pinging the device')
+        return
+    dprint ('\nPinging the device: ',device_id)
+    topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, PUB_SUFFIX) # POWER  
+    dprint (topic, ' (blank)')
+    mqtt.publish (topic, EMPTY_PAYLOAD) 
+            
 # ping all relays of a particular device (enabled or not):
 # this will elicit one response per every relay in that device.
 def ping_relsens (device_id):
@@ -377,7 +382,7 @@ def ping_relsens (device_id):
         dprint ('In simulation mode: not pinging the relays')
         return
     dprint ('\nPinging relsens in the device: ',device_id)
-    topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, BROADCAST_RELSEN)  
+    topic = '{}/{}/{}'.format (PUB_PREFIX, device_id, BROADCAST_RELSEN)  # POWER0
     mqtt.publish (topic, EMPTY_PAYLOAD) 
         
 # send a probe to see which of your devices are responding
@@ -400,7 +405,7 @@ def send_tracer_broadcast():
         dprint ('In simulation mode: not sending tracer')
         return
     topic = '{}/{}/{}'.format (PUB_PREFIX, BROADCAST_DEVICE, BROADCAST_RELSEN) # POWER0
-    dprint ('Sending probe to: ',topic)
+    dprint ('Sending probe: ',topic)
     mqtt.publish (topic, EMPTY_PAYLOAD)  # empty payload gets the relay status
     sensor_count = (sensor_count+1) % SENSOR_INTERVAL   
     if (sensor_count==0):
@@ -409,7 +414,7 @@ def send_tracer_broadcast():
 #---------- send socket io messages
 
 def send_offline_notification (devid):
-    print ('sending offline notification for: ', devid)
+    #print ('sending offline notification for: ', devid)
     for rs in in_mem_relsens[devid]:
         msg = {'device_id':devid, 'relsen_id':rs, 'status' : OFFLINE}
         socketio.emit (SERVER_EVENT, msg)
@@ -588,7 +593,9 @@ def operate_simul_device (devid, relsid, action):
     jstatus = {'device_id' : devid, 'relsen_id' : relsid, 'status' : new_status}
     socketio.emit (SERVER_EVENT, jstatus)
 #----------------- -------------------------------------------
- 
+# This is the preferred way to operate a relay - send an on/off/toggle command through the socket
+# See also: the API '/set/relay/status', which is a RESTful way of doing the same
+# see also:  operate_offline (), which is an offline/ backend tool for doing the same
 @socketio.on (CLIENT_EVENT)   
 def on_socket_event (payload):
     #print ('command: ', payload)
@@ -707,8 +714,10 @@ def get_inmem_relsens():
         return {'result' : False, 'error' : 'in-memory relsens are not available'}
     return in_mem_relsens 
     
-#---------- device status 
-# this is internally called to restore last known good status of a device that comes online
+#---------- device status -------------------------------------------
+# this is internally called to restore last known good status of a device that has just come online
+# TODO: use this to issue commands to offline devices, to be implemented when they are powered up next time
+# TODO: use this to impose timer settings, if the device was offline when the timer strikes
 def restore_device_status (device_status):
     dids = list(device_status.keys())
     #print (dids)
@@ -722,7 +731,8 @@ def restore_device_status (device_status):
         mqtt.publish (topic, actions[rs])
     return True
 
-# A backup API in case socket command fails   
+
+# A backup API - just in case socket communication fails   
 @app.route('/set/relay/status', methods=['GET', 'POST'])
 def set_relay_status():
     try:
@@ -758,7 +768,14 @@ def set_relay_status():
         print ('* EXCEPTION 7: ', str(e))
     return ({'result' : False, 'error' : 'could not operate device'}) 
     
-# return the last known GOOD status (ON/OFF only, offline is excluded) of all the relays of a device 
+# Essentially the same as set_relay_status(), but this can be called : 
+#    (1) by the user, especially when the device is offline (2) called internally from scheduler-timer events
+# The command is queued in last_known_good status and executed when the device comes online
+# Note: this can be used both to swith ON and switch OFF the device. (and, may be toggle?)
+def operate_offline():  # TODO: implement this
+    dprint ("\noperate_offline() stub !\n")
+    
+# return the last known GOOD status (ON/OFF only, offline is excluded) of all the relays of one device 
 @app.route('/get/last/good/status', methods=['GET'])
 def get_last_good_status():
     devid = request.args.get('device_id')
@@ -774,7 +791,7 @@ def get_last_good_status():
         send_tracer_broadcast()  # to build the status
         return {'result' : False, 'error' : 'last-good status is not available; please refresh the page'}
     if (devid not in last_good_status):
-        return ({'result' : False, 'error' : 'invalid or disabled device_id'})  
+        return ({'result' : False, 'error' : 'invalid or inactive device_id'})  
     retval = {devid : {}}
     retval[devid] = last_good_status[devid]
     return retval 
@@ -786,7 +803,8 @@ def dump_all_last_good_status():
         send_tracer_broadcast()  # to build the status
         return {'result' : False, 'error' : 'last-good status is not available; please refresh the page'}
     return last_good_status 
-            
+    
+                
 # return the last known status (ON/OFF/offline) of all the relays of a device; this includes offline also 
 @app.route('/get/device/status', methods=['GET'])
 def get_device_status():
@@ -844,17 +862,6 @@ def dump_all_status():
         return {'result' : False, 'error' : 'in-memory status is not available; please try again'}
     return in_mem_status 
 
-# return the last known status (ON/OFF only) of devices  
-@app.route('/dump/last/good/status', methods=['GET'])
-def dump_last_good_status():
-    if SIMULATION_MODE:
-        #dprint('\nReturning simulated status of registered devices..')
-        return simul_status
-    print('\nReturning last good status of registered and active devices..')
-    if last_good_status is None:
-        send_tracer_broadcast()  # to build the status
-        return {'result' : False, 'error' : 'last-good status is not available; please try again'}
-    return last_good_status 
     
 # return the latest sensor readings of a device 
 @app.route('/get/sensor/values', methods=['GET'])
@@ -1060,8 +1067,8 @@ def dump_network_info():
 # Helper methods
 #------------------------------------------------------------------------------------------------------
 
-def mark_offline (devid):
-    dprint ('Marking offline: ', devid)
+def mark_offline (devid, context):
+    dprint ('Marking offline: {} [{}]'.format (devid, context))
     for rs in in_mem_status[devid]:
         in_mem_status[devid][rs] = OFFLINE  # NOTE: last_good_status remains unaffected
         
