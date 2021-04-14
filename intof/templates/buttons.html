@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:verdana" onload="AutoAdd()">
+
+<h3> <p style="font-family:verdana"> Intof IoT controller </p></h3>
+<a href="/links">Devices</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/discover/devices">Discover</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/auto/onboard/devices">Onboard</a><br/><br/>
+
+<table id="dynaTable">
+
+<!--script src="socket.io.min.js"-->    
+<script src="/static/socket.io.min.js"></script> 
+
+<script type="text/javascript">
+var devices = {{SerVar | tojson }};   
+
+/*var server = 'http://127.0.0.1:5000/';*/
+var server = 'http://' +document.domain +':' +location.port;
+var socket = io.connect(server);
+
+function AutoAdd_verbose () {  /* with logging */
+    for (var key in devices) {
+        /* console.log ("device_id: "+ key + "; relsens_ids: " + devices[key]); */
+        for (var index in devices[key]) {  /* NOTE: devices[key] is just the positional number */
+            console.log ("relay #: " +index + ";  relsen_id: " +devices[key][index]);
+        } /* Outrageous NOTE: index is a string ! */
+        add_row (key);
+    }
+}
+
+function AutoAdd () {
+    for (var key in devices) 
+        add_row (key);
+}
+
+function add_row (device_id) {
+    var table = document.getElementById("dynaTable");    
+    var row = table.insertRow (0);    /* appending rows from bottom to top */
+    var cell = row.insertCell (0);     
+    for (var index in devices[device_id]) {
+        /* console.log ("index: " +index + " ->  relsen_id: " +devices[device_id][index]); */
+        add_button (row, parseInt(index), device_id, devices[device_id][index]);  /* you MUST convert index into a number ! */
+    }    
+
+    row = table.insertRow (0);    /* appending rows from bottom to top */
+    cell = row.insertCell (0);     
+    var label = document.createElement("Label");
+    label.innerHTML = device_id; /* .slice(6,); */
+    label.style="font-size:12px";
+    cell.width = "100px";
+    cell.appendChild (label);
+    /*
+    cell = row.insertCell (1);
+    label = document.createElement("Label");
+    label.innerHTML =  "";
+    cell.width = "100px";
+    cell.appendChild (label);    
+    cell = row.insertCell (2);
+    label = document.createElement("Label");
+    label.innerHTML =  "";
+    cell.width = "100px";    
+    cell.appendChild (label);       
+    cell = row.insertCell (3);
+    label = document.createElement("Label");
+    label.innerHTML =  "";
+    cell.width = "100px";    
+    cell.appendChild (label);      
+    */
+}
+
+function add_button (row_obj, col_no, device_id, relsen_id) {
+ 	var btn = document.createElement("input");
+	btn.setAttribute("type", "button");
+	btn.setAttribute("value", "offline");  /* relsen_id); */
+	btn.setAttribute("name", device_id + ":" + relsen_id);
+	btn.setAttribute("id", device_id + "_" +relsen_id);  
+    btn.setAttribute("style", "color:black; font-size:12px;   width:100px; height:100px; background-color:lightgray;  border:none;  outline:0; border-radius:18px;")
+ 
+    btn.onclick = function () { /* NOTE: this is an inner function */
+         /* don't write this as a separate function outside: it will not be invoked */
+        var jcmd = {"device_id" : device_id, "relsen_id": relsen_id, "action" : 'toggle'}
+        console.log('->[CMD] ' +JSON.stringify (jcmd));
+        socket.emit('client-event', JSON.stringify (jcmd));   
+    }
+    /* console.log("adding column #: " +col_no) */
+    var cell = row_obj.insertCell (col_no); 
+    cell.appendChild (btn);
+}
+
+ socket.on('connect', function()
+ {
+    console.log('Connected to socket server: ' + server);
+ });
+
+ socket.on('message', function(msg)
+ {  
+    console.log ('<-[INFO]' +JSON.stringify (msg));
+ });
+ 
+ socket.on('ACK', function(msg)
+ {  
+    console.log('<-[ACK] ' +JSON.stringify (msg));
+ });
+     
+ socket.on('server-event', function(msg)
+ {  
+    console.log('<=[RESP]' +JSON.stringify (msg));
+    if (msg.relsen_id == 'SENSOR') {
+        /* document.getElementById("status").innerHTML = JSON.stringify(msg) */
+        return;
+    }
+    var bgcolor = 'DarkRed';
+    var fgcolor = 'white';
+    var txt = 'offline';
+    if (msg.status=='ON') {
+        bgcolor =  'green';   
+        fgcolor = 'white';
+        txt = 'OFF';
+    }
+    else if (msg.status=='OFF') {
+        bgcolor =  'gray';  
+        fgcolor = 'black';
+        txt = 'ON';
+    }
+    button_id = msg.device_id + "_" +msg.relsen_id;        
+    document.getElementById (button_id).style.backgroundColor = bgcolor;
+    document.getElementById (button_id).style.color = fgcolor;
+    //document.getElementById (button_id).innerHTML = txt;
+    document.getElementById (button_id).setAttribute("value", txt);
+ });
+ 
+ function send_cmd (deviceid, relsenid, cmd) {
+    var jcmd = {"device_id" : deviceid, "relsen_id": relsenid, "action" : cmd}
+    console.log('->[CMD] ' +JSON.stringify (jcmd));
+    socket.emit('client-event', JSON.stringify (jcmd));
+ }
+          
+</script>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<html>
+   <body>
+   <font face="Arial">
+      <b>Device Manager Tests</b><br/><br/>
+      <table style="font-size:12px">
+        <tr><td><b>Types</b></td></tr>
+        
+        <tr><td><a href="/list/rooms">/list/rooms</a></td><td>List all rooms and their types</td></tr>
+        <tr><td><a href="/list/room/names">/list/room/names</a></td><td>List room names</td></tr>
+        <tr><td><a href="/list/room/types">/list/room/types</a></td><td>List room types</td></tr>
+        <tr><td><a href="/list/room/stats">/list/room/stats</a></td><td>List all rooms, their types and device count</td></tr>
+        
+        <tr><td><a href="/list/relsen/types">/list/relsen/types</a></td><td>List relsen types</td></tr>
+        <tr><td><a href="/list/hardware/types">/list/hardware/types</a></td><td>List hardware types</td></tr>
+        <tr><td><a href="/list/groups">/list/groups</a></td><td>List all group names</td></tr>
+        
+        <tr><td style="color:red"><b>All devices</b></td></tr> 
+        
+        <tr><td><a href="/get/devices">/get/devices</a></td><td>List all device ids</td></tr>
+        <tr><td><a href="/dump/devices">/dump/devices</a></td><td>Dump all devices' JSON representation</td></tr>
+        <tr><td><a href="/dump/device/tree">/dump/device/tree</a></td><td>Dump all devices' JSON  as a tree</td></tr>
+        <tr><td><a href="/dump/device/specs">/dump/device/specs</a></td><td>Dump all devices' technical specs</td></tr>
+        <tr><td><a href="/dump/device/spec/tree">/dump/device/spec/tree</a></td><td>Dump all technical specs as a tree</td></tr>
+        
+        <tr><td><a href="/get/inactive/devices">/get/inactive/devices</a></td><td>Get inactive device ids</td></tr>        
+        <tr><td><a href="/get/active/devices">/get/active/devices</a></td><td>Get active (enabled) device ids</td></tr> 
+        <tr><td><a href="/dump/active/devices">/dump/active/devices</a></td><td>Dump active devices' as a JSON list</td></tr>
+        <tr><td><a href="/dump/active/device/tree">/dump/active/device/tree</a></td><td>Dump active devices as a tree</td></tr>
+        <tr><td><a href="/dump/active/device/specs">/dump/active/device/specs</a></td><td>Dump active devices' technical specs</td></tr>
+        <tr><td><a href="/dump/active/device/spec/tree">/dump/active/device/spec/tree</a></td><td>Dump active devices' specs as a tree</td></tr>
+        
+        <tr><td style="color:red"><b>Device filter</b></td></tr> 
+
+        <tr><td><a href="/get/device/details?device_id=labs1">/get/device/details?device_id=labs1</a></td><td>Dump all info of a device</td></tr>        
+        <tr><td><a href="/get/device/config?device_id=labs1">/get/device/config?device_id=labs1</a></td><td>Get a device's donfig</td></tr>
+        <tr><td><a href="/get/device/specs?device_id=labs1">/get/device/specs?device_id=labs1</a></td><td>Get a device's technical specs</td></tr>
+        
+        <tr><td style="color:red"><b>Relay & Sensor ids</b></td></tr> 
+        
+        <tr><td><a href="/get/relsens">/get/relsens</a></td><td>List all relay ids & sensors ids</td></tr>
+        <tr><td><a href="/get/relsen/tree">/get/relsen/tree</a></td><td>All relay ids & sensors ids as a tree</td></tr>
+        <tr><td><a href="/get/active/relsens">/get/active/relsens</a></td><td>Active relays & sensor id list</td></tr>
+        <tr><td><a href="/get/active/relsen/tree">/get/active/relsen/tree</a></td><td>Active relay & sensor ids as a tree</td></tr>
+        <tr><td><a href="/get/friendly/relsen/tree">/get/friendly/relsen/tree</a></td><td>Get user-friendly names of  relson objects as a tree</td></tr>
+     
+        <tr><td style="color:red"><b>Relay & Sensor objects</b></td></tr> 
+        
+        <tr><td><a href="/dump/relsens">/dump/relsens</a></td><td>Dump full relsens as a list</td></tr>
+        <tr><td><a href="/dump/relsen/tree">/dump/relsen/tree</a></td><td>Dump fulll relsons as a tree</td></tr>
+        <tr><td><a href="/dump/active/relsens">/dump/active/relsens</a></td><td>Active relsen objects as a list</td></tr>
+        <tr><td><a href="/dump/active/relsen/tree">/dump/active/relsen/tree</a></td><td>Active relsen objects as a tree</td></tr>
+        
+        <tr><td style="color:red"><b>Filters</b></td></tr> 
+        <tr><td><a href="/get/friendly/identifier?device_id=labs1&relsen_id=POWER1">/get/friendly/identifier?device_id=labs1&relsen_id=POWER1</a></td><td>Get the user-friendly identifiers of a relsen</td></tr>
+        <tr><td><a href="/get/relsen/ids/by/name?relsen_name=Temperature&room_name=Guest+room">/get/relsen/ids/by/name?relsen_name=Temperature&room_name=Guest+room</a></td><td>Find a relsen id by its relsen name and room name</td></tr>
+        <tr><td><a href="/get/relsens/by/name?relsen_name=Temperature&room_name=Guest+room">/get/relsens/by/name?relsen_name=Temperature&room_name=Guest+room</a></td><td>Get a relsen object by relsen name and room name</td></tr>
+        <tr><td><a href="/get/relsen/details?device_id=labs1&relsen_id=POWER1">/get/relsen/details?device_id=labs1&relsen_id=POWER1</a></td><td>Find a relsen object by id</td></tr>
+        <tr><td><a href="/get/attached/relsen/ids?device_id=labs1">/get/attached/relsen/ids?device_id=labs1</a></td><td>Relsen ids attached to a device</td></tr>
+        <tr><td><a href="/get/attached/relsens?device_id=labs1">/get/attached/relsens?device_id=labs1</a></td><td>Relsen objects attached to a device</td></tr>
+        <tr><td><a href="/get/relsen/ids/in/room?room_name=Kids%20bath%20room">/get/relsen/ids/in/room?room_name=Kids%20bath%20room</a></td><td>Relsen ids in a room</td></tr>
+        <tr><td><a href="/get/relsens/in/room?room_name=Kids%20bath%20room">/get/relsens/in/room?room_name=Kids%20bath%20room</a></td><td>Relsen objects in a room</td></tr>
+        <tr><td><a href="/get/relsen/ids/of/room/type?room_type=Bed%20room">/get/relsen/ids/of/room/type?room_type=Bed%20room</a></td><td>Relsen ids by room type</td></tr>
+        <tr><td><a href="/get/relsens/of/room/type?room_type=Bed%20room">/get/relsens/of/room/type?room_type=Bed%20room</a></td><td>Relsen objects by room type</td></tr>
+        <tr><td><a href="/get/relsen/ids/of/type?relsen_type=Tube%20light">/get/relsen/ids/of/type?relsen_type=Tube%20light</a></td><td>Relsen ids by relsen type</td></tr>
+        <tr><td><a href="/get/relsens/of/type?relsen_type=Tube%20light">/get/relsens/of/type?relsen_type=Tube%20light</a></td><td>Relsen objects by relsen type</td></tr>
+        <tr><td><a href="/get/relsen/ids/in/group?group_name=First%20floor">/get/relsen/ids/of/group?group_name=First%20floor</a></td><td>Relsen ids by group type</td></tr>
+        <tr><td><a href="/get/relsens/in/group?group_name=First%20floor">/get/relsens/of/group?group_name=First%20floor</a></td><td>Relsen objects by group type</td></tr>
+        
+        <tr><td style="color:red"><b>Onboarding and Updates (simulated)</b></td></tr> 
+        <tr><td><a href="/simul/discover/devices">/simul/discover/devices</a></td><td>Simulate discovering new devices</td></tr>        
+        <tr><td><a href="/simul/discover/wifi/devices">/simul/discover/wifi/devices</a></td><td>Simulate discovering new WiFi access points</td></tr>   
+        <tr><td><a href="/simul/onboard/device">/simul/onboard/device</a></td><td>Simulate onboarding a new device</td></tr>    
+        <tr><td><a href="/enable/device?device_id=labs1">/enable/device?device_id=labs1</a></td><td>Enable a device</td></tr>
+        <tr><td><a href="/disable/device?device_id=labs1">/disable/device?device_id=labs1</a></td><td>Disable a device</td></tr>         
+        <tr><td><a href="/simul/bulk/onboard">/simul/bulk/onboard</td><td>Simulate bulk onboarding</td></tr>  
+        <tr><td><a href="/simul/update/device">/simul/update/device</a></td><td>Simulate updating a device</td></tr>
+        <tr><td><a href="/simul/update/relsen">/simul/update/relsen</a></td><td>Simulate updating a relsen</td></tr>  
+        <tr><td><a href="/clear/schedule?device_id=labs1&relsen_id=POWER2">/clear/schedule?device_id=labs1&relsen_id=POWER2</a></td><td>Clear all schedules of a device</td></tr> 
+  
+        <tr><td style="color:red"><b>Ping devices</b></td></tr>
+        
+        <tr><td><a href="/ping/socket">/ping/socket</a></td><td>Ping the socket clients</td></tr>
+        <tr><td><a href="/ping/mqtt">/ping/mqtt</a></td><td>Ping all devices over MQTT</td></tr>
+        <tr><td><a href="/send/tracer">/send/tracer</a></td><td>Broadcast a roll call for relsens</td></tr>
+        <tr><td><a href="/ping/device?device_id=labs1">/ping/device?device_id=labs1</a></td><td>Ping a particular device</td></tr>
+        <tr><td><a href="/ping/relsens?device_id=labs1">/ping/relsens?device_id=labs1</a></td><td>Ping all relays of a device</td></tr>
+        <tr><td><a href="/trigger/sensor?device_id=labs1">/trigger/sensor?device_id=labs1</a></td><td>Request for sensor reading</td></tr>
+        
+        <tr><td style="color:red"><b>Device inventory</b></td></tr>
+        
+        <tr><td><a href="/build/device/inventory">/build/device/inventory</a></td><td>Rebuild in-memory device cache</td></tr>
+        <tr><td><a href="/get/inmem/devices">/get/inmem/devices</a></td><td>Get configuration of cached devices</td></tr>
+        <tr><td><a href="/get/inmem/relsens">/get/inmem/relsens</a></td><td>Get relsen tree of cached devices</td></tr>
+        <tr><td><a href="/discover/devices">/discover/devices</a></td><td>Discover live, but unregistered/ disabled devices</td></tr>
+        <tr><td><a href="/auto/onboard/devices">/auto/onboard/devices</a></td><td>Onboard all new devices in bulk</td></tr>
+
+        <tr><td><a href="/discover/wifi/devices">/discover/wifi/devices</a></td><td>Discover new WiFi access points</td></tr>   
+        <tr><td><a href="/list/discovered/device/ids">/list/discovered/device/ids</a></td><td>Get the ids of live, but disabled devices</td></tr>
+        <tr><td><a href="/get/new/devices">/get/new/devices</a></td><td>Get the relsen tree of live, but unregistered/ disabled devices</td></tr>
+        <tr><td><a href="/dump/network/info">/dump/network/info</a></td><td>Get the IP address and MAC of devices</td></tr>
+       
+        <tr><td style="color:red"><b>Status</b></td></tr>
+        
+        <tr><td><a href="/dump/all/status">/get/all/status</a></td><td>Current status of all devices</td></tr>
+        <tr><td><a href="/get/device/status?device_id=labs1">/get/status?device_id=labs1</a></td><td>Current status of a device</td></tr>
+        <tr><td><a href="/get/relay/status?device_id=labs1&relsen_id=POWER2">/get/status?device_id=labs1&relsen_id=POWER2</a></td><td>Current status of a relsen</td></tr>
+        <tr><td><a href="/get/sensor/values?device_id=labs1">/get/sensor/values?device_id=labs1</a></td><td>Latest sensor readings of a device</td></tr>
+        
+        <tr><td><a href="/get/online/status">/get/online/status</a></td><td>Show which devices are online/ offline</td></tr>
+        <tr><td><a href="/get/online/devices">/get/online/devices</a></td><td>List device ids of all online devices</td></tr>
+        <tr><td><a href="/get/offline/devices">/get/offline/devices</a></td><td>List device ids of all offline devices</td></tr>
+        <tr><td><a href="/get/online/relsens">/get/online/relsens</a></td><td>Get the relsen tree of registered online devices</td></tr>
+        <tr><td><a href="/get/offline/relsens">/get/offline/relsens</a></td><td>Get the relsen tree of registered offline devices</td></tr>
+        <tr><td><a href="/get/on/relsens">/get/on/relsens</a></td><td>Get the relsens that are ON</td></tr>
+        <tr><td><a href="/get/off/relsens">/get/off/relsens</a></td><td>Get the relsens that are OFF</td></tr>
+        
+        <tr><td style="color:red"><b>Push Notification</b></td></tr> 
+        
+        <tr><td><a href="/buttons">/buttons</a></td><td>Example Javascript client for SocketIO communication</td></tr>
+
+        <tr><td style="color:red"><b>Database Admin (Caution!)</b></td></tr>
+        
+        <tr><td><a href="/create/db">/create/db</a></td><td>Create the database</td></tr>
+        <tr><td><a href="/add/minimal/data">/add/minimal/data</a></td><td>Add minimalistic test devices</td></tr>
+        <tr><td><a href="/add/test/data">/add/test/data</a></td><td>Add detailed test devices</td></tr> 
+ 
+        <tr><td><a href="/remove/device?device_id=labs1">/remove/device?device_id=labs1</a></td><td>Remove one device</td></tr>
+        <tr><td><a href="/remove/all/devices">/remove/all/devices</a></td><td>Remove all devices</td></tr>
+        <tr><td><a href="/remove/all/relsens">/remove/all/relsens</a></td><td>Remove all relays & sensors</td></tr>
+        <tr><td><a href="/remove/all/status">/remove/all/status</a></td><td>Remove status</td></tr>        
+        <tr><td><a href="/delete/db">/delete/db</a></td><td>Delete the database</td></tr>       
+
+        <tr><td style="color:red"><b>User Management</b></td></tr> 
+        <tr><td><a href="/login/form">/login/form</a></td><td>Login page</td></tr>       
+        <tr><td><a href="/logout">/logout</a></td><td>Logout</td></tr>       
+        <tr><td><a href="/list/users">/list/users</a></td><td>List all users</td></tr>
+        <tr><td><a href="/registration/form">/registration/form</a></td><td>Register a new user</td></tr>   
+        
+        <tr><td style="color:red"><b>Authentication</b></td></tr> 
+        <tr><td><a href="/secure">/secure</a></td><td>Secure call; requires authentication</td></tr>
+        <tr><td><a href="/insecure">/insecure</a></td><td>Open URL; authentication is not required</td></tr>
+        <tr><td><a href="/secure/random">/secure/random</a></td><td>Get a random number only if you are authenticated</td></tr>
+        <tr><td><a href="/random">/random</a></td><td>Get a random number even without authentication</td></tr>
+
+        </table>         
+   </body>
+</html>
